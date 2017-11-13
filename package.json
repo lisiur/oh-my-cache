@@ -5,5 +5,9 @@
   "main": "index.js",
   "repository": "git@github.com:lisiur/oh-my-cache",
   "author": "lisiurday <lisiurday@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "md5": "^2.2.1",
+    "ramda": "^0.25.0"
+  }
 }
