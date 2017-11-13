@@ -1,6 +1,6 @@
 {
   "name": "oh-my-cache",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A cache system using client pattern",
   "main": "index.js",
   "repository": "git@github.com:lisiur/oh-my-cache",
