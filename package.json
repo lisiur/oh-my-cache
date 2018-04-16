@@ -1,13 +1,20 @@
 {
   "name": "oh-my-cache",
   "version": "0.1.0",
-  "description": "A cache system using client pattern",
-  "main": "index.js",
+  "description": "Cache Util",
+  "main": "./dist/OhMyCache.js",
   "repository": "git@github.com:lisiur/oh-my-cache",
   "author": "lisiurday <lisiurday@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "dist": "webpack"
+  },
   "dependencies": {
     "md5": "^2.2.1",
     "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14"
   }
 }
