@@ -1,6 +1,6 @@
 {
   "name": "oh-my-cache",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Cache Util",
   "main": "./dist/OhMyCache.js",
   "repository": "git@github.com:lisiur/oh-my-cache",
