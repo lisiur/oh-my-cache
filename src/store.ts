@@ -1,11 +1,14 @@
 interface Config {
   fn: Function
   expire: number
-  expireTime: number
-  dependencies: Set<string>
   triggers: Set<string>
-  cached: Boolean
-  data: any
+  cache: Map<
+    string,
+    {
+      expireTime: number
+      data: any
+    }
+  >
 }
 
 interface RegisterParams {
@@ -25,30 +28,46 @@ class Store {
     const config = {
       fn,
       expire,
-      expireTime: +new Date(),
-      dependencies: new Set(dependencies),
       triggers: new Set() as Set<string>,
-      cached: false,
-      data: null,
-    }
+      cache: new Map()
+    } as Config
     this.store.set(name, config)
-    this.setDependencies(name, config.dependencies)
+    this.setDependencies(name, new Set(dependencies))
   }
 
   async call(name: string, ...args: any[]) {
-    const item = this.store.get(name)
-    if (item.cached) {
-      if (+new Date() < item.expireTime) {
-        return item.data
-      }
+    const {fn, triggers} = this.store.get(name)
+    let data = this.getCache(name, args)
+    if (data) {
+      return data
     }
-    item.data = await item.fn.call(null, ...args)
-    item.expireTime = item.expire + new Date().getTime()
-    item.cached = true
-    item.triggers.forEach(name => {
+    data = await fn.call(null, ...args)
+    this.setCache(name, args, data)
+
+    triggers.forEach(name => {
       this.resetCacheItem(name)
     })
-    return item.data
+    return data
+  }
+
+  private getCache(name: string, args: any[]) {
+    const item = this.store.get(name)
+    const cache = item.cache.get(JSON.stringify(args))
+    if (!cache) {
+      return null
+    }
+    if (+new Date() > cache.expireTime) {
+      return null
+    }
+    return cache.data
+  }
+
+  private setCache(name: string, args: any[], data: any) {
+    const item = this.store.get(name)
+    item.cache.set(JSON.stringify(args), {
+      expireTime: item.expire + new Date().getTime(),
+      data,
+    })
   }
 
   private setDependencies(name: string, dependencies: Set<string>) {
@@ -66,8 +85,7 @@ class Store {
    */
   private resetCacheItem(name: string) {
     const item = this.store.get(name)
-    item.cached = false
-    item.data = null
+    item.cache = new Map()
   }
 }
 

@@ -16,11 +16,11 @@ test("Without dependencies", () => {
   })
   ;(async function() {
     await cache.call('post', 1)
-    let res1 = await cache.call('get')
+    let res1 = await cache.call('get', 1)
     await cache.call('post', 2)
     await new Promise(r => setTimeout(r, 300))
-    let res2 = await cache.call('get')
-    expect([res1, res2]).toEqual([1, 1])
+    let res2 = await cache.call('get', 2)
+    expect([res1, res2]).toEqual([1, 2])
   })()
 })
 
