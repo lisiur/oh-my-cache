@@ -50,7 +50,7 @@ class Store {
     return data
   }
 
-  async callFn(name: string) {
+  callFn(name: string) {
     return (...args: any[]) => this.call(name, ...args)
   }
 
