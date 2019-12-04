@@ -50,6 +50,10 @@ class Store {
     return data
   }
 
+  async callFn(name: string) {
+    return (...args: any[]) => this.call(name, ...args)
+  }
+
   private getCache(name: string, args: any[]) {
     const item = this.store.get(name)
     const cache = item.cache.get(JSON.stringify(args))
