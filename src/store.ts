@@ -41,7 +41,7 @@ class Store {
     if (data) {
       return data
     }
-    data = await fn.call(null, ...args)
+    data = fn.call(null, ...args)
     this.setCache(name, args, data)
 
     triggers.forEach(name => {
