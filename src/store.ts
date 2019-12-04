@@ -56,6 +56,9 @@ class Store {
     if (!cache) {
       return null
     }
+    if (item.expire <= 0) {
+      return null
+    }
     if (+new Date() > cache.expireTime) {
       return null
     }
@@ -64,6 +67,9 @@ class Store {
 
   private setCache(name: string, args: any[], data: any) {
     const item = this.store.get(name)
+    if (item.expire <= 0) {
+      return
+    }
     item.cache.set(JSON.stringify(args), {
       expireTime: item.expire + new Date().getTime(),
       data,
