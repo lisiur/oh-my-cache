@@ -1,6 +1,6 @@
 {
   "name": "oh-my-cache",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "lib/oh-my-cache.umd.js",
   "dependencies": {
