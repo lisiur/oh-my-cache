@@ -1,0 +1,38 @@
+{
+  "name": "oh-my-cache",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/ob-my-cache.umd.js",
+  "dependencies": {
+    "@babel/polyfill": "^7.7.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-typescript": "^7.7.4",
+    "@types/jest": "^24.0.23",
+    "jest": "^24.9.0",
+    "rollup": "^1.27.8",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript": "^1.0.1",
+    "ts-jest": "^24.2.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
+  },
+  "scripts": {
+    "build": "npx rollup -c",
+    "test": "npx jest --no-cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lisiur/oh-my-cache.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lisiur/oh-my-cache/issues"
+  },
+  "homepage": "https://github.com/lisiur/oh-my-cache#readme"
+}
