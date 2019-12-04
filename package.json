@@ -2,7 +2,7 @@
   "name": "oh-my-cache",
   "version": "1.0.1",
   "description": "",
-  "main": "lib/ob-my-cache.umd.js",
+  "main": "lib/oh-my-cache.umd.js",
   "dependencies": {
     "@babel/polyfill": "^7.7.0"
   },
