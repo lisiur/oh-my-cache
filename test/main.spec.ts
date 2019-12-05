@@ -39,7 +39,8 @@ test("Without dependencies", async () => {
 test("With dependencies", async () => {
   const cache = new Store()
   cache.register('post', post)
-  cache.register('get', get, {
+  cache.register('get', get)
+  cache.registerConfig('get', {
     expire: 1000,
     dependencies: ['post'],
   })

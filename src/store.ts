@@ -35,6 +35,21 @@ class Store {
     this.setDependencies(name, new Set(dependencies))
   }
 
+  registerConfig(name: string, params: RegisterParams = {}) {
+    const { expire = 0, dependencies = [] } = params
+    const config = this.store.get(name)
+    if (!config) {
+      throw new Error(`${name} hasn't be registed`)
+    }
+    this.store.set(name, {
+      ...config,
+      expire,
+      triggers: new Set() as Set<string>,
+      cache: new Map()
+    })
+    this.setDependencies(name, new Set(dependencies))
+  }
+
   async call(name: string, ...args: any[]) {
     const {fn, triggers} = this.store.get(name)
     let data = this.getCache(name, args)
