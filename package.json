@@ -22,7 +22,9 @@
     "typescript": "^3.7.2"
   },
   "scripts": {
-    "build": "npx rollup -c",
+    "rollup": "npx rollup -c",
+    "types": "npx tsc -p tsconfig.type.json",
+    "build": "npm run rollup; npm run types",
     "test": "npx jest --no-cache"
   },
   "repository": {

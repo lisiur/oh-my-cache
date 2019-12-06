@@ -11,7 +11,9 @@ declare class Store {
     constructor();
     register(name: string, fn: Function, params?: RegisterParams): void;
     registerConfig(name: string, params?: RegisterParams): void;
-    registerObj<T extends Record<string, Function>, K extends keyof T>(obj: T, configs?: RegisterParams<K>[]): T;
+    registerObj<T extends Record<string, Function>, K extends keyof T>(obj: T, params?: RegisterParams<K>[], config?: {
+        bind: boolean;
+    }): T;
     call(name: string, ...args: any[]): Promise<any>;
     callFn(name: string): (...args: any[]) => Promise<any>;
     private getConfig;

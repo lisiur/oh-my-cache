@@ -53,15 +53,22 @@ class Store {
 
   registerObj<T extends Record<string, Function>, K extends keyof T>(
     obj: T,
-    configs: RegisterParams<K>[] = []
+    params: RegisterParams<K>[] = [],
+    config = {
+      bind: false
+    }
   ): T {
     const res = {} as Record<string, Function>
     Object.entries(obj).forEach(([name, fn]) => {
-      this.register(name, fn.bind(obj))
+      if (config.bind) {
+        this.register(name, fn.bind(obj))
+      } else {
+        this.register(name, fn.bind(res))
+      }
       res[name] = this.callFn(name)
     })
-    configs.forEach((config, i) => {
-      const { name, ...cfg } = config
+    params.forEach((param, i) => {
+      const { name, ...cfg } = param
       if (!name) {
         throw new Error(`config[${i}] doesn't has name`)
       }
