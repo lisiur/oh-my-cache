@@ -55,7 +55,7 @@ class Store {
     obj: T,
     configs: RegisterParams<K>[] = []
   ): T {
-    const res = {}
+    const res = {} as Record<string, Function>
     Object.entries(obj).forEach(([name, fn]) => {
       this.register(name, fn.bind(obj))
       res[name] = this.callFn(name)
@@ -71,7 +71,7 @@ class Store {
   }
 
   async call(name: string, ...args: any[]) {
-    const { fn, triggers } = this.store.get(name)
+    const { fn, triggers } = this.getConfig(name)
     let data = this.getCache(name, args)
     if (data) {
       return data
@@ -93,8 +93,16 @@ class Store {
     return (...args: any[]) => this.call(name, ...args)
   }
 
+  private getConfig(name: string) {
+    const config = this.store.get(name)
+    if (!config) {
+      throw new Error(`${name} hasn't be registered`)
+    }
+    return config
+  }
+
   private getCache(name: string, args: any[]) {
-    const item = this.store.get(name)
+    const item = this.getConfig(name)
     const cache = item.cache.get(JSON.stringify(args))
     if (!cache) {
       return null
@@ -109,7 +117,7 @@ class Store {
   }
 
   private setCache(name: string, args: any[], data: any) {
-    const item = this.store.get(name)
+    const item = this.getConfig(name)
     if (item.expire <= 0) {
       return
     }
@@ -125,17 +133,10 @@ class Store {
   ) {
     dependencies.forEach(dependency => {
       if (typeof dependency === 'string') {
-        const store = this.store
-        if (!store.get(dependency)) {
-          throw new Error(`${dependency} hasn't be registed`)
-        }
-        store.get(dependency).triggers.add(name)
+        this.getConfig(dependency).triggers.add(name)
       } else {
-        const store = dependency.store.store
-        if (!store.get(dependency.name)) {
-          throw new Error(`${dependency} hasn't be registed`)
-        }
-        store.get(dependency.name).triggers.add({ name, store: this })
+        const store = dependency.store
+        store.getConfig(dependency.name).triggers.add({ name, store: this })
       }
     })
   }
@@ -145,7 +146,7 @@ class Store {
    * @param name
    */
   private resetCacheItem(name: string) {
-    const item = this.store.get(name)
+    const item = this.getConfig(name)
     item.cache = new Map()
   }
 }

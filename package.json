@@ -3,6 +3,7 @@
   "version": "1.0.9",
   "description": "",
   "main": "lib/oh-my-cache.umd.js",
+  "types": "types/main.d.ts",
   "dependencies": {
     "@babel/polyfill": "^7.7.0"
   },
