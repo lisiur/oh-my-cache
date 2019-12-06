@@ -1,7 +1,7 @@
 interface Config {
   fn: Function
   expire: number
-  triggers: Set<string>
+  triggers: Set<string | { name: string; store: Store }>
   cache: Map<
     string,
     {
@@ -11,9 +11,10 @@ interface Config {
   >
 }
 
-interface RegisterParams {
+interface RegisterParams<T = any> {
+  name?: T
   expire?: number
-  dependencies?: string[]
+  dependencies?: Array<T | { name: string; store: Store }>
 }
 
 class Store {
@@ -29,7 +30,7 @@ class Store {
       fn,
       expire,
       triggers: new Set() as Set<string>,
-      cache: new Map()
+      cache: new Map(),
     } as Config
     this.store.set(name, config)
     this.setDependencies(name, new Set(dependencies))
@@ -45,13 +46,32 @@ class Store {
       ...config,
       expire,
       triggers: new Set() as Set<string>,
-      cache: new Map()
+      cache: new Map(),
     })
     this.setDependencies(name, new Set(dependencies))
   }
 
+  registerObj<T extends Record<string, Function>, K extends keyof T>(
+    obj: T,
+    configs: RegisterParams<K>[] = []
+  ): T {
+    const res = {}
+    Object.entries(obj).forEach(([name, fn]) => {
+      this.register(name, fn.bind(obj))
+      res[name] = this.callFn(name)
+    })
+    configs.forEach((config, i) => {
+      const { name, ...cfg } = config
+      if (!name) {
+        throw new Error(`config[${i}] doesn't has name`)
+      }
+      this.registerConfig(name as string, cfg)
+    })
+    return res as T
+  }
+
   async call(name: string, ...args: any[]) {
-    const {fn, triggers} = this.store.get(name)
+    const { fn, triggers } = this.store.get(name)
     let data = this.getCache(name, args)
     if (data) {
       return data
@@ -59,8 +79,12 @@ class Store {
     data = fn.call(null, ...args)
     this.setCache(name, args, data)
 
-    triggers.forEach(name => {
-      this.resetCacheItem(name)
+    triggers.forEach(trigger => {
+      if (typeof trigger === 'string') {
+        this.resetCacheItem(trigger)
+      } else {
+        trigger.store.resetCacheItem(trigger.name)
+      }
     })
     return data
   }
@@ -95,12 +119,24 @@ class Store {
     })
   }
 
-  private setDependencies(name: string, dependencies: Set<string>) {
+  private setDependencies(
+    name: string,
+    dependencies: Set<string | { name: string; store: Store }>
+  ) {
     dependencies.forEach(dependency => {
-      if (!this.store.get(dependency)) {
-        throw new Error(`${dependency} hasn't be registed`)
+      if (typeof dependency === 'string') {
+        const store = this.store
+        if (!store.get(dependency)) {
+          throw new Error(`${dependency} hasn't be registed`)
+        }
+        store.get(dependency).triggers.add(name)
+      } else {
+        const store = dependency.store.store
+        if (!store.get(dependency.name)) {
+          throw new Error(`${dependency} hasn't be registed`)
+        }
+        store.get(dependency.name).triggers.add({ name, store: this })
       }
-      this.store.get(dependency).triggers.add(name)
     })
   }
 
