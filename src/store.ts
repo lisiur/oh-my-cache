@@ -83,17 +83,27 @@ class Store {
     if (data) {
       return data
     }
-    data = fn.call(null, ...args)
-    this.setCache(name, args, data)
+    const res = fn.call(null, ...args)
 
-    triggers.forEach(trigger => {
-      if (typeof trigger === 'string') {
-        this.resetCacheItem(trigger)
-      } else {
-        trigger.store.resetCacheItem(trigger.name)
-      }
-    })
-    return data
+    this.setCache(name, args, res)
+
+    return Promise.resolve(res)
+      .then(data => {
+        this.setCache(name, args, data)
+
+        triggers.forEach(trigger => {
+          if (typeof trigger === 'string') {
+            this.resetCacheItem(trigger)
+          } else {
+            trigger.store.resetCacheItem(trigger.name)
+          }
+        })
+        return data
+      })
+      .catch(err => {
+        this.resetCacheItem(name)
+        throw err
+      })
   }
 
   callFn(name: string) {
@@ -153,8 +163,7 @@ class Store {
    * @param name
    */
   private resetCacheItem(name: string) {
-    const item = this.getConfig(name)
-    item.cache = new Map()
+    this.getConfig(name).cache.clear()
   }
 }
 
